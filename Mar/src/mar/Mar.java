@@ -18,81 +18,91 @@ import java.util.logging.Logger;
  * @author Anthony Caliri
  */
 public class Mar {
-    
+
     public static ArrayList<PCB> processList = new ArrayList<>();
-    
+
     public static PCB p1 = new PCB();
     public static PCB p2 = new PCB();
     public static PCB p3 = new PCB();
     public static PCB p4 = new PCB();
-    
+
     public static Scanner scan = new Scanner(System.in);
-    
-//    public static Clock clock = new Clock();
+
     public static int clock;
-    
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         int processNum = promptForProcessAmount();
-        
+
         readProgramFiles();
         
+        printProcessList();
         generateProcesses(processNum);
-        
+
         int returnVal = startProcessing();
-        
-        switch(returnVal){
+
+        switch (returnVal) {
             case 0:
                 System.out.println("Processes finished normaly");
                 break;
             case -1:
                 System.out.println("Error while processing!");
         }
-        
+
     }
-    
-    private static int startProcessing(){
-        // DOING FIRST COMD FIRST SERVE FOR PART 1
+
+    private static int startProcessing() {
+        // DOING FIRST COME FIRST SERVE FOR PART 1
         short totalRuntime;
         int loopClock;
         long sysTime = System.currentTimeMillis();
+        String op;
         for (PCB pcb : processList) {
-            loopClock = 0;
             totalRuntime = pcb.getTotalRuntime();
             System.out.println(pcb.getName() + " " + totalRuntime);
-            
-            while(loopClock < totalRuntime){
-                if(System.currentTimeMillis() - sysTime >= 10){
-                    loopClock++;
-                    sysTime = System.currentTimeMillis();
+
+            for (String s : pcb.getOperationList()) {
+                
+                loopClock = 0;
+                if (!s.contains("EXE")) {
+                    op = s.substring(0, 10).trim();
+                    pcb.setCurOperation(op);
+                    totalRuntime = Short.parseShort(s.replaceAll("[^\\d]", ""));
+
+                    while (loopClock < totalRuntime) {
+                        if (System.currentTimeMillis() - sysTime >= 10) {
+                            loopClock++;
+                            sysTime = System.currentTimeMillis();
+                        }
+                    }
                 }
             }
-            
+
         }
         return 0;
     }
-    
+
     private static void dispatcher() {
         /* 
             CANT I DO THIS BY USING MY setState() METHOD ON EACH INDIVUAL PROCESS AS THE
             PROCESS NEEDS TO CHANGE STATES?
-        */
+         */
     }
-    
+
     private static int promptForProcessAmount() {
         System.out.println("How many processes would you like to generate?");
         return scan.nextInt();
     }
-    
-    private static void generateProcesses(int processNum){
+
+    private static void generateProcesses(int processNum) {
         Random rand = new Random();
         int processToAdd;
-        for(int i = 0; i < processNum; i++){
+        for (int i = 0; i < processNum; i++) {
             processToAdd = rand.nextInt((4 - 1) + 1) + 1;
-    
-            switch(processToAdd){
+
+            switch (processToAdd) {
                 case 1:
                     processList.add(p1);
                     break;
@@ -107,15 +117,24 @@ public class Mar {
             }
         }
     }
-    
-    
+
     private static void readProgramFiles() {
         try {
-            // READ PROCESS FILE 1
-            Scanner fileIn = new Scanner(new File("PF-1.txt"));
+            readPF1();
+            readPF2();
+            readPF3();
+            readPF4();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+    
+    private static void readPF1() throws FileNotFoundException{
+        Scanner fileIn = new Scanner(new File("PF-1.txt"));
             String line;
             short tmp;
-          
+
             p1.setName(fileIn.nextLine().replace("Name: ", ""));
             line = fileIn.nextLine().replace("Total runtime: ", "");
             tmp = Short.parseShort(line);
@@ -123,20 +142,20 @@ public class Mar {
             line = fileIn.nextLine().replace("Memory: ", "");
             tmp = Short.parseShort(line);
             p1.setMemory(tmp);
-            
-            ArrayList<String> operationList = new ArrayList<>();
-            
-            while(fileIn.hasNextLine()){
+
+            fileIn.nextLine();
+            while (fileIn.hasNextLine()) {
                 line = fileIn.nextLine();
-                operationList.add(line);
+                p1.addToOpList(line);
             }
-            
-            p1.setOperationList(operationList);
-            
-            // READ PROCESS FILE 2
-            fileIn = new Scanner(new File("PF-2.txt"));
-            
-            
+    }
+    
+    private static void readPF2() throws FileNotFoundException {
+        
+        Scanner fileIn = new Scanner(new File("PF-2.txt"));
+        String line;
+        short tmp;
+        
             p2.setName(fileIn.nextLine().replace("Name: ", ""));
             line = fileIn.nextLine().replace("Total runtime: ", "");
             tmp = Short.parseShort(line);
@@ -144,20 +163,19 @@ public class Mar {
             line = fileIn.nextLine().replace("Memory: ", "");
             tmp = Short.parseShort(line);
             p2.setMemory(tmp);
-            
-            operationList = new ArrayList<>();
-            
-            while(fileIn.hasNextLine()){
+
+            fileIn.nextLine();
+            while (fileIn.hasNextLine()) {
                 line = fileIn.nextLine();
-                operationList.add(line);
+                p2.addToOpList(line);
             }
-            
-            p2.setOperationList(operationList);
-            
-            // READ PROCESS FILE 3
-            fileIn = new Scanner(new File("PF-3.txt"));
-            
-            
+    }
+    
+    private static void readPF3() throws FileNotFoundException {
+        Scanner fileIn = new Scanner(new File("PF-3.txt"));
+        String line;
+        short tmp;
+        
             p3.setName(fileIn.nextLine().replace("Name: ", ""));
             line = fileIn.nextLine().replace("Total runtime: ", "");
             tmp = Short.parseShort(line);
@@ -165,20 +183,19 @@ public class Mar {
             line = fileIn.nextLine().replace("Memory: ", "");
             tmp = Short.parseShort(line);
             p3.setMemory(tmp);
-            
-            operationList = new ArrayList<>();
-            
-            while(fileIn.hasNextLine()){
+
+            fileIn.nextLine();
+            while (fileIn.hasNextLine()) {
                 line = fileIn.nextLine();
-                operationList.add(line);
+                p3.addToOpList(line);
             }
-            
-            p3.setOperationList(operationList);
-            
-            // READ PROCESS FILE 4
-            fileIn = new Scanner(new File("PF-4.txt"));
-            
-            
+    }
+    
+    private static void readPF4() throws FileNotFoundException {
+        Scanner fileIn = new Scanner(new File("PF-4.txt"));
+        String line;
+        short tmp;
+        
             p4.setName(fileIn.nextLine().replace("Name: ", ""));
             line = fileIn.nextLine().replace("Total runtime: ", "");
             tmp = Short.parseShort(line);
@@ -186,24 +203,20 @@ public class Mar {
             line = fileIn.nextLine().replace("Memory: ", "");
             tmp = Short.parseShort(line);
             p4.setMemory(tmp);
-            
-            operationList = new ArrayList<>();
-            
-            while(fileIn.hasNextLine()){
+
+            fileIn.nextLine();
+            while (fileIn.hasNextLine()) {
                 line = fileIn.nextLine();
-                operationList.add(line);
+                p4.addToOpList(line);
             }
-            
-            p4.setOperationList(operationList);
-            
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
-    
-    private static void printProcessList(){
-        for(PCB pcb : processList){
+
+    private static void printProcessList() {
+        for (PCB pcb : processList) {
             System.out.println(pcb.toString());
+            for (String s : pcb.getOperationList()){
+                System.out.println("\t" + s);
+            }
         }
     }
 }
