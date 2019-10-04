@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author tonyt
+ * @author Anthony Caliri
  */
 
 enum State { NEW, READY, RUN, WAIT, EXIT }
@@ -34,13 +34,13 @@ public class PCB {
         this.operationList = new ArrayList<>();
     }
     
-    public PCB(String name, short totalRuntime, byte memory, State state, Operation curOperation) {
+    public PCB(String name, short totalRuntime, byte memory, State state, Operation curOperation, ArrayList<String> operationList) {
         this.name = name;
         this.totalRuntime = totalRuntime;
         this.memory = memory;
         this.state = state;
         this.curOperation = curOperation;
-        this.operationList = new ArrayList<>();
+        this.operationList = operationList;
     }
 
     public void setName(String name) {
