@@ -18,7 +18,8 @@ import java.util.logging.Logger;
  * @author Anthony Caliri
  */
 public class Mar {
-
+    enum State { NEW, READY, RUN, WAIT, EXIT }
+    
     public static ArrayList<PCB> processList = new ArrayList<>();
     
     public static PCB p1 = new PCB();
@@ -38,8 +39,28 @@ public class Mar {
         
         generateProcesses(processNum);
         
+        int returnVal = startProcessing();
         
+        switch(returnVal){
+            case 0:
+                System.out.println("Processes finished normaly");
+                break;
+            case -1:
+                System.out.println("Error while processing!");
+        }
         
+    }
+    
+    private static int startProcessing(){
+        
+        return 0;
+    }
+    
+    private static void dispatcher() {
+        /* 
+            CANT I DO THIS BY USING MY setState() METHOD ON EACH INDIVUAL PROCESS AS THE
+            PROCESS NEEDS TO CHANGE STATES?
+        */
     }
     
     private static int promptForProcessAmount() {
