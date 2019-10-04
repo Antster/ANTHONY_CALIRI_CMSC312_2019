@@ -26,16 +26,28 @@ public class Mar {
     public static PCB p3 = new PCB();
     public static PCB p4 = new PCB();
     
-    
     public static Scanner scan = new Scanner(System.in); 
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        System.out.println("How many processes would you like to generate?");
-        int processNum = scan.nextInt();
+        int processNum = promptForProcessAmount();
+        
         readProgramFiles();
         
+        generateProcesses(processNum);
+        
+        
+        
+    }
+    
+    private static int promptForProcessAmount() {
+        System.out.println("How many processes would you like to generate?");
+        return scan.nextInt();
+    }
+    
+    private static void generateProcesses(int processNum){
         Random rand = new Random();
         int processToAdd;
         for(int i = 0; i < processNum; i++){
@@ -54,10 +66,6 @@ public class Mar {
                 case 4:
                     processList.add(p4);
             }
-        }
-        
-        for(PCB pcb : processList){
-            System.out.println(pcb.toString());
         }
     }
     
@@ -151,6 +159,12 @@ public class Mar {
             
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private static void printProcessList(){
+        for(PCB pcb : processList){
+            System.out.println(pcb.toString());
         }
     }
 }
