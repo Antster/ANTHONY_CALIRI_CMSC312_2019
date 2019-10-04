@@ -18,7 +18,6 @@ import java.util.logging.Logger;
  * @author Anthony Caliri
  */
 public class Mar {
-    enum State { NEW, READY, RUN, WAIT, EXIT }
     
     public static ArrayList<PCB> processList = new ArrayList<>();
     
@@ -27,7 +26,10 @@ public class Mar {
     public static PCB p3 = new PCB();
     public static PCB p4 = new PCB();
     
-    public static Scanner scan = new Scanner(System.in); 
+    public static Scanner scan = new Scanner(System.in);
+    
+//    public static Clock clock = new Clock();
+    public static int clock;
     
     /**
      * @param args the command line arguments
@@ -52,7 +54,23 @@ public class Mar {
     }
     
     private static int startProcessing(){
-        
+        // DOING FIRST COMD FIRST SERVE FOR PART 1
+        short totalRuntime;
+        int loopClock;
+        long sysTime = System.currentTimeMillis();
+        for (PCB pcb : processList) {
+            loopClock = 0;
+            totalRuntime = pcb.getTotalRuntime();
+            System.out.println(pcb.getName() + " " + totalRuntime);
+            
+            while(loopClock < totalRuntime){
+                if(System.currentTimeMillis() - sysTime >= 10){
+                    loopClock++;
+                    sysTime = System.currentTimeMillis();
+                }
+            }
+            
+        }
         return 0;
     }
     
