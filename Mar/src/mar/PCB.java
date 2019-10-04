@@ -5,6 +5,8 @@
  */
 package mar;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author tonyt
@@ -14,6 +16,9 @@ enum State { NEW, READY, RUN, WAIT, EXIT }
 enum Operation { CALCULATE, IO, YEILD, OUT }
 
 public class PCB {
+    
+    private static ArrayList<String> operationList;
+    
     private String name;
     private short totalRuntime;
     private short memory;
@@ -26,6 +31,7 @@ public class PCB {
         this.memory = 0;
         this.state = null;
         this.curOperation = null;
+        this.operationList = new ArrayList<>();
     }
     
     public PCB(String name, short totalRuntime, byte memory, State state, Operation curOperation) {
@@ -34,6 +40,7 @@ public class PCB {
         this.memory = memory;
         this.state = state;
         this.curOperation = curOperation;
+        this.operationList = new ArrayList<>();
     }
 
     public void setName(String name) {
@@ -44,7 +51,7 @@ public class PCB {
         this.totalRuntime = totalRuntime;
     }
 
-    public void setMemory(byte memory) {
+    public void setMemory(short memory) {
         this.memory = memory;
     }
 
@@ -74,6 +81,10 @@ public class PCB {
 
     public Operation getCurOperation() {
         return curOperation;
+    }
+    
+    public ArrayList<String> getOperationList() {
+        return operationList;
     }
     
 }
