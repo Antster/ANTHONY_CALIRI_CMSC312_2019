@@ -63,6 +63,10 @@ public class PCB {
         this.curOperation = curOperation;
     }
 
+    public void setOperationList(ArrayList<String> opL) {
+        this.operationList = (ArrayList<String>) opL.clone();
+    }
+    
     public String getName() {
         return name;
     }
@@ -87,4 +91,9 @@ public class PCB {
         return operationList;
     }
     
+    @Override
+    public String toString(){
+        return "Process Name: " + getName() + " Total Runtime: " + getTotalRuntime() + " Memory: " + getMemory() 
+                + " \nCurrent State: " + getState() + " Current Operation: " + getCurOperation();
+    }
 }
