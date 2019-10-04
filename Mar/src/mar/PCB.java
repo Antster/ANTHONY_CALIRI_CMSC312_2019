@@ -31,16 +31,15 @@ public class PCB {
         this.memory = 0;
         this.state = null;
         this.curOperation = null;
-        this.operationList = new ArrayList<>();
+        operationList = new ArrayList<>();
     }
     
-    public PCB(String name, short totalRuntime, byte memory, State state, Operation curOperation, ArrayList<String> operationList) {
+    public PCB(String name, short totalRuntime, byte memory, State state, Operation curOperation) {
         this.name = name;
         this.totalRuntime = totalRuntime;
         this.memory = memory;
         this.state = state;
         this.curOperation = curOperation;
-        this.operationList = operationList;
     }
 
     public void setName(String name) {
@@ -59,12 +58,25 @@ public class PCB {
         this.state = state;
     }
 
-    public void setCurOperation(Operation curOperation) {
-        this.curOperation = curOperation;
+    public void setCurOperation(String op) {
+        switch(op.toLowerCase()){
+            case "calculate":
+                this.curOperation = Operation.CALCULATE;
+                break;
+            case "yeild":
+                this.curOperation = Operation.YEILD;
+                break;
+            case "out":
+                this.curOperation = Operation.OUT;
+                break;
+            case "io":
+                this.curOperation = Operation.IO;
+                break;
+        }
     }
-
-    public void setOperationList(ArrayList<String> opL) {
-        this.operationList = (ArrayList<String>) opL.clone();
+    
+    public void addToOpList(String s){
+        operationList.add(s);
     }
     
     public String getName() {
