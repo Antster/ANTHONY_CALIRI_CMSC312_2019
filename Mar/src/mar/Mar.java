@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * @author Anthony Caliri
+ * Description: Main class for the Mar operating system simulator
  */
 package mar;
 
@@ -15,7 +14,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Anthony Caliri
+ * 
  */
 public class Mar {
 
@@ -38,9 +37,11 @@ public class Mar {
 
         readProgramFiles();
         
-        printProcessList();
         generateProcesses(processNum);
-
+        
+        // Uncomment the line below to see problem!
+//        printProcessList();
+        
         int returnVal = startProcessing();
 
         switch (returnVal) {
@@ -72,7 +73,7 @@ public class Mar {
                     totalRuntime = Short.parseShort(s.replaceAll("[^\\d]", ""));
 
                     while (loopClock < totalRuntime) {
-                        if (System.currentTimeMillis() - sysTime >= 10) {
+                        if (System.currentTimeMillis() - sysTime >= 5) {
                             loopClock++;
                             sysTime = System.currentTimeMillis();
                         }
@@ -212,6 +213,7 @@ public class Mar {
     }
 
     private static void printProcessList() {
+        System.out.println(processList.size());
         for (PCB pcb : processList) {
             System.out.println(pcb.toString());
             for (String s : pcb.getOperationList()){
