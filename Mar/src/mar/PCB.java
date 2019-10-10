@@ -17,7 +17,7 @@ enum Operation { CALCULATE, IO, YEILD, OUT }
 
 public class PCB {
     
-    private static ArrayList<String> operationList;
+    private ArrayList<String> operationList;
     
     private String name;
     private short totalRuntime;
