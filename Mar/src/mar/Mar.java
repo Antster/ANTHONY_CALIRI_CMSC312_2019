@@ -38,7 +38,7 @@ public class Mar {
         readProgramFiles();
         
         generateProcesses(processNum);
-        
+
         // Uncomment the line below to see problem!
 //        printProcessList();
         
@@ -121,18 +121,8 @@ public class Mar {
 
     private static void readProgramFiles() {
         try {
-            readPF1();
-            readPF2();
-            readPF3();
-            readPF4();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
-    
-    private static void readPF1() throws FileNotFoundException{
-        Scanner fileIn = new Scanner(new File("PF-1.txt"));
+            // READ PF-1 -------------------------------------------------------
+            Scanner fileIn = new Scanner(new File("PF-1.txt"));
             String line;
             short tmp;
 
@@ -149,14 +139,10 @@ public class Mar {
                 line = fileIn.nextLine();
                 p1.addToOpList(line);
             }
-    }
-    
-    private static void readPF2() throws FileNotFoundException {
-        
-        Scanner fileIn = new Scanner(new File("PF-2.txt"));
-        String line;
-        short tmp;
-        
+            
+            // READ PF-2 -------------------------------------------------------
+            fileIn = new Scanner(new File("PF-2.txt"));
+
             p2.setName(fileIn.nextLine().replace("Name: ", ""));
             line = fileIn.nextLine().replace("Total runtime: ", "");
             tmp = Short.parseShort(line);
@@ -170,13 +156,10 @@ public class Mar {
                 line = fileIn.nextLine();
                 p2.addToOpList(line);
             }
-    }
-    
-    private static void readPF3() throws FileNotFoundException {
-        Scanner fileIn = new Scanner(new File("PF-3.txt"));
-        String line;
-        short tmp;
-        
+            
+            // READ PF-3 -------------------------------------------------------
+            fileIn = new Scanner(new File("PF-3.txt"));
+
             p3.setName(fileIn.nextLine().replace("Name: ", ""));
             line = fileIn.nextLine().replace("Total runtime: ", "");
             tmp = Short.parseShort(line);
@@ -190,13 +173,10 @@ public class Mar {
                 line = fileIn.nextLine();
                 p3.addToOpList(line);
             }
-    }
-    
-    private static void readPF4() throws FileNotFoundException {
-        Scanner fileIn = new Scanner(new File("PF-4.txt"));
-        String line;
-        short tmp;
-        
+            
+            // READ PF-4 -------------------------------------------------------
+            fileIn = new Scanner(new File("PF-4.txt"));
+
             p4.setName(fileIn.nextLine().replace("Name: ", ""));
             line = fileIn.nextLine().replace("Total runtime: ", "");
             tmp = Short.parseShort(line);
@@ -210,6 +190,11 @@ public class Mar {
                 line = fileIn.nextLine();
                 p4.addToOpList(line);
             }
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     private static void printProcessList() {
