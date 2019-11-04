@@ -7,6 +7,7 @@ package mar;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * 
+ *
  */
 public class Mar {
 
@@ -36,12 +37,14 @@ public class Mar {
         int processNum = promptForProcessAmount();
 
         readProgramFiles();
-        
+
         generateProcesses(processNum);
 
-        // Uncomment the line below to see problem!
+        //Uncomment to see ProcessList
 //        printProcessList();
-        
+       
+        sortProcessList();
+       
         int returnVal = startProcessing();
 
         switch (returnVal) {
@@ -52,6 +55,11 @@ public class Mar {
                 System.out.println("Error while processing!");
         }
 
+    }
+    
+    // Sort by shortest runtime
+    private static void sortProcessList() {
+        Collections.sort(processList);
     }
 
     private static int startProcessing() {
@@ -65,7 +73,7 @@ public class Mar {
             System.out.println(pcb.getName() + " " + totalRuntime);
 
             for (String s : pcb.getOperationList()) {
-                
+
                 loopClock = 0;
                 if (!s.contains("EXE")) {
                     op = s.substring(0, 10).trim();
@@ -139,7 +147,7 @@ public class Mar {
                 line = fileIn.nextLine();
                 p1.addToOpList(line);
             }
-            
+
             // READ PF-2 -------------------------------------------------------
             fileIn = new Scanner(new File("PF-2.txt"));
 
@@ -156,7 +164,7 @@ public class Mar {
                 line = fileIn.nextLine();
                 p2.addToOpList(line);
             }
-            
+
             // READ PF-3 -------------------------------------------------------
             fileIn = new Scanner(new File("PF-3.txt"));
 
@@ -173,7 +181,7 @@ public class Mar {
                 line = fileIn.nextLine();
                 p3.addToOpList(line);
             }
-            
+
             // READ PF-4 -------------------------------------------------------
             fileIn = new Scanner(new File("PF-4.txt"));
 
@@ -190,7 +198,7 @@ public class Mar {
                 line = fileIn.nextLine();
                 p4.addToOpList(line);
             }
-            
+
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -198,12 +206,24 @@ public class Mar {
     }
 
     private static void printProcessList() {
-        System.out.println(processList.size());
+        System.out.println("ProcessList size: " + processList.size());
+
         for (PCB pcb : processList) {
             System.out.println(pcb.toString());
-            for (String s : pcb.getOperationList()){
-                System.out.println("\t" + s);
+        }
+    }
+
+    private static void printProcessList(boolean verbose) {
+        System.out.println("ProcessList size: " + processList.size());
+
+        for (PCB pcb : processList) {
+            System.out.println(pcb.toString());
+            if (verbose) {
+                for (String s : pcb.getOperationList()) {
+                    System.out.println("\t" + s);
+                }
             }
         }
     }
+
 }
