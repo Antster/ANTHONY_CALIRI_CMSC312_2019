@@ -15,7 +15,7 @@ import java.util.ArrayList;
 enum State { NEW, READY, RUN, WAIT, EXIT }
 enum Operation { CALCULATE, IO, YEILD, OUT }
 
-public class PCB {
+public class PCB implements Comparable < PCB >{
     
     private ArrayList<String> operationList;
     
@@ -107,5 +107,12 @@ public class PCB {
     public String toString(){
         return "Process Name: " + getName() + " Total Runtime: " + getTotalRuntime() + " Memory: " + getMemory() 
                 + " \nCurrent State: " + getState() + " Current Operation: " + getCurOperation();
+    }
+
+    @Override
+    public int compareTo(PCB o) {
+        Integer x = (int) this.getTotalRuntime();
+        Integer y = (int) o.getTotalRuntime();
+        return x.compareTo(y);
     }
 }
