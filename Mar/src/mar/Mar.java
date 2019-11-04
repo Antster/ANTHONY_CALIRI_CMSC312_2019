@@ -62,8 +62,8 @@ public class Mar {
         Collections.sort(processList);
     }
 
+    // After sorting processing of the list is done FCFS 
     private static int startProcessing() {
-        // DOING FIRST COME FIRST SERVE FOR PART 1
         short totalRuntime;
         int loopClock;
         long sysTime = System.currentTimeMillis();
@@ -71,15 +71,17 @@ public class Mar {
         for (PCB pcb : processList) {
             totalRuntime = pcb.getTotalRuntime();
             System.out.println(pcb.getName() + " " + totalRuntime);
-
+            
+            pcb.setState(State.READY);
+            
             for (String s : pcb.getOperationList()) {
-
+                if (pcb.getState() == State.READY) pcb.setState(State.RUN);
                 loopClock = 0;
                 if (!s.contains("EXE")) {
                     op = s.substring(0, 10).trim();
                     pcb.setCurOperation(op);
                     totalRuntime = Short.parseShort(s.replaceAll("[^\\d]", ""));
-
+                    
                     while (loopClock < totalRuntime) {
                         if (System.currentTimeMillis() - sysTime >= 5) {
                             loopClock++;
@@ -88,11 +90,17 @@ public class Mar {
                     }
                 }
             }
-
+            pcb.setState(State.EXIT);
         }
         return 0;
     }
 
+    private static void printProcessState(PCB pcb){
+        System.out.println("Process State: " + pcb.getState());
+        
+        System.out.println("Current Operation: " + pcb.getCurOperation());
+    }
+    
     private static void dispatcher() {
         /* 
             CANT I DO THIS BY USING MY setState() METHOD ON EACH INDIVUAL PROCESS AS THE
@@ -147,6 +155,7 @@ public class Mar {
                 line = fileIn.nextLine();
                 p1.addToOpList(line);
             }
+            p1.setState(State.NEW);
 
             // READ PF-2 -------------------------------------------------------
             fileIn = new Scanner(new File("PF-2.txt"));
@@ -164,6 +173,7 @@ public class Mar {
                 line = fileIn.nextLine();
                 p2.addToOpList(line);
             }
+            p2.setState(State.NEW);
 
             // READ PF-3 -------------------------------------------------------
             fileIn = new Scanner(new File("PF-3.txt"));
@@ -181,7 +191,8 @@ public class Mar {
                 line = fileIn.nextLine();
                 p3.addToOpList(line);
             }
-
+            p3.setState(State.NEW);
+            
             // READ PF-4 -------------------------------------------------------
             fileIn = new Scanner(new File("PF-4.txt"));
 
@@ -198,6 +209,7 @@ public class Mar {
                 line = fileIn.nextLine();
                 p4.addToOpList(line);
             }
+            p4.setState(State.NEW);
 
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
