@@ -24,6 +24,7 @@ public class PCB implements Comparable < PCB >{
     private short memory;
     private State state;
     private Operation curOperation;
+    private boolean inCritical;
 
     public PCB () {
         this.name = "";
@@ -32,6 +33,7 @@ public class PCB implements Comparable < PCB >{
         this.state = null;
         this.curOperation = null;
         operationList = new ArrayList<>();
+        this.inCritical = false;
     }
     
     public PCB(String name, short totalRuntime, byte memory, State state, Operation curOperation) {
@@ -56,6 +58,10 @@ public class PCB implements Comparable < PCB >{
 
     public void setState(State state) {
         this.state = state;
+    }
+    
+    public void setCritical(boolean b){
+        this.inCritical = b;
     }
 
     public void setCurOperation(String op) {
@@ -93,6 +99,10 @@ public class PCB implements Comparable < PCB >{
 
     public State getState() {
         return state;
+    }
+    
+    public boolean getCritical(){
+        return inCritical;
     }
 
     public Operation getCurOperation() {
