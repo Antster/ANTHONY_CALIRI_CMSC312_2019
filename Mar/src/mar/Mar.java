@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,6 +30,8 @@ public class Mar {
     public static Scanner scan = new Scanner(System.in);
 
     public static int clock;
+    
+    public static boolean isCriticalTaken = false;
 
     /**
      * @param args the command line arguments
@@ -78,7 +81,20 @@ public class Mar {
                 if (pcb.getState() == State.READY) pcb.setState(State.RUN);
                 loopClock = 0;
                 if (!s.contains("EXE")) {
+                    if(s.contains("<")){
+//                        System.out.println("Starting Critical Section");
+                        while(isCriticalTaken) {} // If another process is in critical section wait until it calls release() which will end this loop
+                        acquire();
+                        continue;
+                    } else if (s.contains(">")){
+//                        System.out.println("Ending Critical Section");
+                        release();
+                        continue;
+                    }
                     op = s.substring(0, 10).trim();
+                    
+//                    if(isCriticalTaken) System.out.println(op);
+                    
                     pcb.setCurOperation(op);
                     totalRuntime = Short.parseShort(s.replaceAll("[^\\d]", ""));
                     
@@ -236,6 +252,13 @@ public class Mar {
                 }
             }
         }
+    }
+    
+    private static void acquire(){
+        isCriticalTaken = true;
+    }
+    private static void release(){
+        isCriticalTaken = false;
     }
 
 }
