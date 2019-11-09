@@ -2,11 +2,8 @@ Name: Krimzon Fury
 Total runtime: 97
 Memory: 97
 
+<
 CALCULATE   90
 I/O        7
+>
 EXE
-
-
-Name: Dark Haven
-Total runtime: 1138
-Memory: 56

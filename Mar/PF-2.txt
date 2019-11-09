@@ -17,7 +17,9 @@ CALCULATE   25
 YIELD       25
 I/0         45
 CALCULATE   75
+<
 I/0         82
 CALCULATE   173
 I/0         27
+>
 EXE

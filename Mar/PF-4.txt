@@ -4,9 +4,11 @@ Memory: 56
 
 CALCULATE   48
 OUT         5
+<
 I/0         78
 CALCULATE   451
 I/0         308
+>
 CALCULATE   68
 CALCULATE   21
 CALCULATE   71

@@ -5,6 +5,8 @@ Memory: 19
 CALCULATE   3
 CALCULATE   9
 CALCULATE   7
+<
 CALCULATE   13
 I/0         9
+>
 EXE
