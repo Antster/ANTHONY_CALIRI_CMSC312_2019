@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Stack;
@@ -22,6 +23,8 @@ public class Mar {
 
     public static ArrayList<PCB> processList = new ArrayList<>();
 
+    public static List<PCB> MainMemory = new ArrayList<>();
+
     public static PCB p1 = new PCB();
     public static PCB p2 = new PCB();
     public static PCB p3 = new PCB();
@@ -30,7 +33,8 @@ public class Mar {
     public static Scanner scan = new Scanner(System.in);
 
     public static int clock;
-    
+    public static short memorySpace = 300;
+
     public static boolean isCriticalTaken = false;
 
     /**
@@ -45,9 +49,8 @@ public class Mar {
 
         //Uncomment to see ProcessList
 //        printProcessList();
-       
         sortProcessList();
-       
+
         int returnVal = startProcessing();
 
         switch (returnVal) {
@@ -59,7 +62,7 @@ public class Mar {
         }
 
     }
-    
+
     // Sort by shortest runtime
     private static void sortProcessList() {
         Collections.sort(processList);
@@ -74,30 +77,35 @@ public class Mar {
         for (PCB pcb : processList) {
             totalRuntime = pcb.getTotalRuntime();
             System.out.println(pcb.getName() + " " + totalRuntime);
-            
-            pcb.setState(State.READY);
-            
+
+            while (!memHasSpace(pcb.getMemory())); // If main memory does not have space for this process, wait until there is space
+
+            addToMainMemory(pcb);
+
             for (String s : pcb.getOperationList()) {
-                if (pcb.getState() == State.READY) pcb.setState(State.RUN);
+                if (pcb.getState() == State.READY) {
+                    pcb.setState(State.RUN);
+                }
                 loopClock = 0;
                 if (!s.contains("EXE")) {
-                    if(s.contains("<")){
-//                        System.out.println("Starting Critical Section");
-                        while(isCriticalTaken) {} // If another process is in critical section wait until it calls release() which will end this loop
+                    if (s.contains("<")) {
+                        while (isCriticalTaken) {
+                        } // If another process is in critical section wait until it calls release() which will end this loop
                         acquire();
                         continue;
-                    } else if (s.contains(">")){
-//                        System.out.println("Ending Critical Section");
+                    } else if (s.contains(">")) {
                         release();
                         continue;
                     }
                     op = s.substring(0, 10).trim();
-                    
-//                    if(isCriticalTaken) System.out.println(op);
-                    
+
                     pcb.setCurOperation(op);
                     totalRuntime = Short.parseShort(s.replaceAll("[^\\d]", ""));
-                    
+
+                    if (pcb.getCurOperation().equals("I/0")) {
+                        pcb.setState(State.WAIT);
+                    }
+
                     while (loopClock < totalRuntime) {
                         if (System.currentTimeMillis() - sysTime >= 5) {
                             loopClock++;
@@ -106,17 +114,18 @@ public class Mar {
                     }
                 }
             }
+            removeFromMainMemory(pcb);
             pcb.setState(State.EXIT);
         }
         return 0;
     }
 
-    private static void printProcessState(PCB pcb){
+    private static void printProcessState(PCB pcb) {
         System.out.println("Process State: " + pcb.getState());
-        
+
         System.out.println("Current Operation: " + pcb.getCurOperation());
     }
-    
+
     private static void dispatcher() {
         /* 
             CANT I DO THIS BY USING MY setState() METHOD ON EACH INDIVUAL PROCESS AS THE
@@ -208,7 +217,7 @@ public class Mar {
                 p3.addToOpList(line);
             }
             p3.setState(State.NEW);
-            
+
             // READ PF-4 -------------------------------------------------------
             fileIn = new Scanner(new File("PF-4.txt"));
 
@@ -253,12 +262,38 @@ public class Mar {
             }
         }
     }
-    
-    private static void acquire(){
+
+    private static void acquire() {
         isCriticalTaken = true;
     }
-    private static void release(){
+
+    private static void release() {
         isCriticalTaken = false;
+    }
+
+    private static boolean memHasSpace(short in) {
+        return (memorySpace - in) >= 0;
+    }
+
+    private static boolean addToMainMemory(PCB p) {
+        if (memHasSpace(p.getMemory())) {
+            memorySpace -= p.getMemory();
+            MainMemory.add(p);
+            p.setState(State.READY);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean removeFromMainMemory(PCB p) {
+        try {
+            memorySpace += p.getMemory();
+            MainMemory.remove(p);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
 }
