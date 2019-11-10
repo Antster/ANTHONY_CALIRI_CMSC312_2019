@@ -1,6 +1,6 @@
 Name: Quantum Leap
 Total runtime: 1000
-Memory: 500
+Memory: 250
 
 OUT         5
 CALCULATE   50

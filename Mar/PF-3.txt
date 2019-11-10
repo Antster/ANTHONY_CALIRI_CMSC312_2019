@@ -1,6 +1,6 @@
 Name: Prime Process
 Total runtime: 41
-Memory: 19
+Memory: 71
 
 CALCULATE   3
 CALCULATE   9
