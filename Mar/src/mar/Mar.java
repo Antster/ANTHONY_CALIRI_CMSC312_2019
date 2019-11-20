@@ -14,6 +14,7 @@ import java.util.Scanner;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.concurrent.Semaphore;
 
 /**
  *
@@ -23,26 +24,23 @@ public class Mar {
 
     public static ArrayList<PCB> processList = new ArrayList<>();
 
-    public static List<PCB> MainMemory = new ArrayList<>();
+    public static MCU mcu = new MCU(300);
 
     public static PCB p1 = new PCB();
     public static PCB p2 = new PCB();
     public static PCB p3 = new PCB();
     public static PCB p4 = new PCB();
+    public static PCB p5 = new PCB();
 
     public static Scanner scan = new Scanner(System.in);
 
     public static int clock;
-    public static short memorySpace = 300;
-
-    public static boolean isCriticalTaken = false;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         int processNum = promptForProcessAmount();
-
         readProgramFiles();
 
         generateProcesses(processNum);
@@ -55,22 +53,24 @@ public class Mar {
 
         switch (returnVal) {
             case 0:
-                System.out.println("Processes finished normaly");
+                System.out.println("\nProcessing finished normaly");
                 break;
             case -1:
-                System.out.println("Error while processing!");
+                System.out.println("\nError while processing!");
         }
 
     }
 
-    // Sort by shortest runtime
+    // Sort by intest runtime
     private static void sortProcessList() {
         Collections.sort(processList);
     }
 
     // After sorting processing of the list is done FCFS 
     private static int startProcessing() {
-        short totalRuntime;
+        Semaphore semaphore = new Semaphore(1);
+        
+        int totalRuntime;
         int loopClock;
         long sysTime = System.currentTimeMillis();
         String op;
@@ -78,7 +78,7 @@ public class Mar {
             totalRuntime = pcb.getTotalRuntime();
             System.out.println(pcb.getName() + " " + totalRuntime);
 
-            while (!memHasSpace(pcb.getMemory())); // If main memory does not have space for this process, wait until there is space
+            while (!MCU.memHasSpace(pcb.getMemory())); // If main memory does not have space for this process, wait until there is space
 
             addToMainMemory(pcb);
 
@@ -89,12 +89,14 @@ public class Mar {
                 loopClock = 0;
                 if (!s.contains("EXE")) {
                     if (s.contains("<")) {
-                        while (isCriticalTaken) {
-                        } // If another process is in critical section wait until it calls release() which will end this loop
-                        acquire();
-                        continue;
+                        try {
+                            semaphore.acquire();
+                            continue;
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     } else if (s.contains(">")) {
-                        release();
+                        semaphore.release();
                         continue;
                     }
                     op = s.substring(0, 10).trim();
@@ -142,7 +144,7 @@ public class Mar {
         Random rand = new Random();
         int processToAdd;
         for (int i = 0; i < processNum; i++) {
-            processToAdd = rand.nextInt((4 - 1) + 1) + 1;
+            processToAdd = rand.nextInt((5 - 1) + 1) + 1;
 
             switch (processToAdd) {
                 case 1:
@@ -156,6 +158,13 @@ public class Mar {
                     break;
                 case 4:
                     processList.add(p4);
+                    break;
+                case 5:
+                    processList.add(p5);
+                    break;
+                default:
+                    processList.add(p1);
+                    break;
             }
         }
     }
@@ -165,7 +174,7 @@ public class Mar {
             // READ PF-1 -------------------------------------------------------
             Scanner fileIn = new Scanner(new File("PF-1.txt"));
             String line;
-            short tmp;
+            int tmp;
 
             p1.setName(fileIn.nextLine().replace("Name: ", ""));
             line = fileIn.nextLine().replace("Total runtime: ", "");
@@ -235,6 +244,24 @@ public class Mar {
                 p4.addToOpList(line);
             }
             p4.setState(State.NEW);
+            
+            // READ PF-4 -------------------------------------------------------
+            fileIn = new Scanner(new File("PF-5.txt"));
+
+            p5.setName(fileIn.nextLine().replace("Name: ", ""));
+            line = fileIn.nextLine().replace("Total runtime: ", "");
+            tmp = Short.parseShort(line);
+            p5.setTotalRuntime(tmp);
+            line = fileIn.nextLine().replace("Memory: ", "");
+            tmp = Short.parseShort(line);
+            p5.setMemory(tmp);
+
+            fileIn.nextLine();
+            while (fileIn.hasNextLine()) {
+                line = fileIn.nextLine();
+                p5.addToOpList(line);
+            }
+            p5.setState(State.NEW);
 
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
@@ -263,22 +290,10 @@ public class Mar {
         }
     }
 
-    private static void acquire() {
-        isCriticalTaken = true;
-    }
-
-    private static void release() {
-        isCriticalTaken = false;
-    }
-
-    private static boolean memHasSpace(short in) {
-        return (memorySpace - in) >= 0;
-    }
-
     private static boolean addToMainMemory(PCB p) {
-        if (memHasSpace(p.getMemory())) {
-            memorySpace -= p.getMemory();
-            MainMemory.add(p);
+        if (MCU.memHasSpace(p.getMemory())) {
+            MCU.setMemorySpace(MCU.getMemorySpace() - p.getMemory());
+            MCU.addToMemList(p);
             p.setState(State.READY);
         } else {
             return false;
@@ -288,8 +303,8 @@ public class Mar {
 
     private static boolean removeFromMainMemory(PCB p) {
         try {
-            memorySpace += p.getMemory();
-            MainMemory.remove(p);
+            MCU.setMemorySpace(MCU.getMemorySpace() + p.getMemory());
+            MCU.removeToMemList(p);
         } catch (Exception e) {
             return false;
         }
