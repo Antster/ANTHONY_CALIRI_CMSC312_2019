@@ -20,8 +20,8 @@ public class PCB implements Comparable < PCB >{
     private ArrayList<String> operationList;
     
     private String name;
-    private short totalRuntime;
-    private short memory;
+    private int totalRuntime;
+    private int memory;
     private State state;
     private Operation curOperation;
     private boolean inCritical;
@@ -36,7 +36,7 @@ public class PCB implements Comparable < PCB >{
         this.inCritical = false;
     }
     
-    public PCB(String name, short totalRuntime, byte memory, State state, Operation curOperation) {
+    public PCB(String name, int totalRuntime, byte memory, State state, Operation curOperation) {
         this.name = name;
         this.totalRuntime = totalRuntime;
         this.memory = memory;
@@ -48,11 +48,11 @@ public class PCB implements Comparable < PCB >{
         this.name = name;
     }
 
-    public void setTotalRuntime(short totalRuntime) {
+    public void setTotalRuntime(int totalRuntime) {
         this.totalRuntime = totalRuntime;
     }
 
-    public void setMemory(short memory) {
+    public void setMemory(int memory) {
         this.memory = memory;
     }
 
@@ -89,11 +89,11 @@ public class PCB implements Comparable < PCB >{
         return name;
     }
 
-    public short getTotalRuntime() {
+    public int getTotalRuntime() {
         return totalRuntime;
     }
 
-    public short getMemory() {
+    public int getMemory() {
         return memory;
     }
 
