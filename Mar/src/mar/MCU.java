@@ -33,7 +33,7 @@ public class MCU {
     protected static void addToMemList(PCB p){
         memoryList.add(p);
     }
-    protected static void removeToMemList(PCB p){
+    protected static void removeFromMemList(PCB p){
         memoryList.remove(p);
     }
     
