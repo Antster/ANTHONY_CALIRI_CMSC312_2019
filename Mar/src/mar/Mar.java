@@ -24,8 +24,8 @@ public class Mar {
 
     public static ArrayList<PCB> processList = new ArrayList<>();
 
-    public static MCU mcu = new MCU(300);
-
+    public static MCU mcu = new MCU(1000);
+    
     public static PCB p1 = new PCB();
     public static PCB p2 = new PCB();
     public static PCB p3 = new PCB();
@@ -51,73 +51,74 @@ public class Mar {
 
         int returnVal = startProcessing();
 
-        switch (returnVal) {
-            case 0:
-                System.out.println("\nProcessing finished normaly");
-                break;
-            case -1:
-                System.out.println("\nError while processing!");
-        }
-
+//        switch (returnVal) {
+//            case 0:
+//                System.out.println("\nProcessing finished normaly");
+//                break;
+//            case -1:
+//                System.out.println("\nError while processing!");
+//        }
     }
 
-    // Sort by intest runtime
+    // Sort by shortest runtime
     private static void sortProcessList() {
         Collections.sort(processList);
     }
 
     // After sorting processing of the list is done FCFS 
     private static int startProcessing() {
-        Semaphore semaphore = new Semaphore(1);
-        
-        int totalRuntime;
-        int loopClock;
+//        Semaphore semaphore = new Semaphore(1);
+//        
+//        int totalRuntime;
+//        int loopClock;
         long sysTime = System.currentTimeMillis();
-        String op;
+//        String op;
         for (PCB pcb : processList) {
-            totalRuntime = pcb.getTotalRuntime();
-            System.out.println(pcb.getName() + " " + totalRuntime);
-
-            while (!MCU.memHasSpace(pcb.getMemory())); // If main memory does not have space for this process, wait until there is space
-
-            addToMainMemory(pcb);
-
-            for (String s : pcb.getOperationList()) {
-                if (pcb.getState() == State.READY) {
-                    pcb.setState(State.RUN);
-                }
-                loopClock = 0;
-                if (!s.contains("EXE")) {
-                    if (s.contains("<")) {
-                        try {
-                            semaphore.acquire();
-                            continue;
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    } else if (s.contains(">")) {
-                        semaphore.release();
-                        continue;
-                    }
-                    op = s.substring(0, 10).trim();
-
-                    pcb.setCurOperation(op);
-                    totalRuntime = Short.parseShort(s.replaceAll("[^\\d]", ""));
-
-                    if (pcb.getCurOperation().equals("I/0")) {
-                        pcb.setState(State.WAIT);
-                    }
-
-                    while (loopClock < totalRuntime) {
-                        if (System.currentTimeMillis() - sysTime >= 5) {
-                            loopClock++;
-                            sysTime = System.currentTimeMillis();
-                        }
-                    }
-                }
-            }
-            removeFromMainMemory(pcb);
-            pcb.setState(State.EXIT);
+            (new Thread(new ProcessRunnable(pcb, sysTime, mcu))).start();
+            
+//            totalRuntime = pcb.getTotalRuntime();
+//            System.out.println(pcb.getName() + " " + totalRuntime);
+//
+//            while (!MCU.memHasSpace(pcb.getMemory())); // If main memory does not have space for this process, wait until there is space
+//
+//            addToMainMemory(pcb);
+//
+//            for (String s : pcb.getOperationList()) {
+//                if (pcb.getState() == State.READY) {
+//                    pcb.setState(State.RUN);
+//                }
+//                loopClock = 0;
+//                if (!s.contains("EXE")) {
+//                    if (s.contains("<")) {
+//                        try {
+//                            semaphore.acquire();
+//                            continue;
+//                        } catch (InterruptedException ex) {
+//                            Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
+//                        }
+//                    } else if (s.contains(">")) {
+//                        semaphore.release();
+//                        continue;
+//                    }
+//                    op = s.substring(0, 10).trim();
+//
+//                    pcb.setCurOperation(op);
+//                    totalRuntime = Short.parseShort(s.replaceAll("[^\\d]", ""));
+//
+//                    if (pcb.getCurOperation().equals("I/0")) {
+//                        pcb.setState(State.WAIT);
+//                    }
+//
+//                    while (loopClock < totalRuntime) {
+//                        if (System.currentTimeMillis() - sysTime >= 5) {
+//                            loopClock++;
+//                            sysTime = System.currentTimeMillis();
+//                        }
+//                    }
+//                }
+//            }
+//            removeFromMainMemory(pcb);
+//            pcb.setState(State.EXIT);
         }
         return 0;
     }
@@ -244,7 +245,7 @@ public class Mar {
                 p4.addToOpList(line);
             }
             p4.setState(State.NEW);
-            
+
             // READ PF-4 -------------------------------------------------------
             fileIn = new Scanner(new File("PF-5.txt"));
 
@@ -290,25 +291,24 @@ public class Mar {
         }
     }
 
-    private static boolean addToMainMemory(PCB p) {
-        if (MCU.memHasSpace(p.getMemory())) {
-            MCU.setMemorySpace(MCU.getMemorySpace() - p.getMemory());
-            MCU.addToMemList(p);
-            p.setState(State.READY);
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean removeFromMainMemory(PCB p) {
-        try {
-            MCU.setMemorySpace(MCU.getMemorySpace() + p.getMemory());
-            MCU.removeToMemList(p);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
-
+//    public static boolean addToMainMemory(PCB p) {
+//        if (MCU.memHasSpace(p.getMemory())) {
+//            MCU.setMemorySpace(MCU.getMemorySpace() - p.getMemory());
+//            MCU.addToMemList(p);
+//            p.setState(State.READY);
+//        } else {
+//            return false;
+//        }
+//        return true;
+//    }
+//
+//    public static boolean removeFromMainMemory(PCB p) {
+//        try {
+//            MCU.setMemorySpace(MCU.getMemorySpace() + p.getMemory());
+//            MCU.removeToMemList(p);
+//        } catch (Exception e) {
+//            return false;
+//        }
+//        return true;
+//    }
 }
