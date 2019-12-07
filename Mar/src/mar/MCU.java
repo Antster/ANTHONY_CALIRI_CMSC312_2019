@@ -1,43 +1,60 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mar;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
- * @author tonyt
+ * @author Anthony Caliri
  */
 public class MCU {
 
-    private static int memorySpace;
+    private int freePages;
     
-    private static List<PCB> memoryList = new ArrayList<>();
+    private Page[] pageArray;
     
     public MCU(int memSpace) {
-        this.memorySpace = memSpace;
+        this.freePages = memSpace;
+        initPageArray(memSpace);
     }
     
-    protected static int getMemorySpace() {
-        return memorySpace;
+    private void initPageArray(int memSpace){
+        pageArray = new Page[memSpace];
+        
+        Page page;
+        
+        for(int i = 0; i < pageArray.length-1; i++){
+            page = new Page(i);
+            pageArray[i] = page;
+        }
     }
     
-    protected static void setMemorySpace(int in){
-        memorySpace = in;
+    protected int getFreePages() {
+        return freePages;
     }
     
-    protected static void addToMemList(PCB p){
-        memoryList.add(p);
-    }
-    protected static void removeFromMemList(PCB p){
-        memoryList.remove(p);
+    protected void addPage(Page page){
+        for(int i = 0; i < pageArray.length-1; i++){
+            if(!pageArray[i].getTaken()){
+                page.setIndex(i);
+                pageArray[i] = page;
+                this.freePages--;
+            }
+        }
     }
     
-    protected static boolean memHasSpace(int in) {
-        return (memorySpace - in) >= 0;
+    protected void removePage(Page page){
+        for(int i = 0; i < pageArray.length-1; i++){
+            if(pageArray[i].getIndex() == page.getIndex()){
+                pageArray[i].setOwner(null);
+                pageArray[i].setTaken(false);
+                this.freePages++;
+            }
+        }
+    }
+    
+    protected void removeAllProcessPages(PCB pcb){
+        for(Page p : pageArray){
+            if(p.getOwner().equals(pcb)){
+                removePage(p);
+            }
+        }
     }
 }
