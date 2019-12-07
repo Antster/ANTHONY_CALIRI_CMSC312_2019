@@ -11,28 +11,30 @@ import java.util.logging.Logger;
 public class ProcessRunnable implements Runnable {
 
     private PCB pcb;
-    private int totalRuntime, loopClock;
+    private int totalRuntime, loopClock, numPages;
     private long sysTime;
     private static MCU mcu;
 
     public ProcessRunnable(PCB p, long sT, MCU mem) {
         this.pcb = p;
+        this.numPages = this.pcb.getNumberOfPages();
         this.sysTime = sT;
         this.mcu = mem;
     }
 
     @Override
     public void run() {
-        boolean memHasSpaceMsg = false; int msgCount = 0;
+        boolean memHasSpaceMsg = false;
+        int msgCount = 0;
         Semaphore semaphore = new Semaphore(1);
         String op;
         totalRuntime = pcb.getTotalRuntime();
         System.out.println("STARTED " + pcb.getName() + " " + totalRuntime);
 
         // If main memory does not have space for this process, wait until there is space
-        while (!mcu.memHasSpace(pcb.getMemory())){
-            if(!memHasSpaceMsg && msgCount % 50 == 0){
-                System.out.println(pcb.getName() + " WAITING FOR SPACE IN MAIN MEMORY!");
+        while (numPages > mcu.getFreePages()) {
+            if (!memHasSpaceMsg && msgCount % 50 == 0) {
+                System.out.println(pcb.getName() + " WAITING FOR PAGES TO OPEN IN MAIN MEMORY!");
                 memHasSpaceMsg = true;
             }
         }
@@ -77,14 +79,15 @@ public class ProcessRunnable implements Runnable {
         }
         removeFromMainMemory(pcb);
         pcb.setState(State.EXIT);
-        
+
         System.out.println("ENDED " + pcb.getName());
     }
 
     private static boolean addToMainMemory(PCB p) {
-        if (mcu.memHasSpace(p.getMemory())) {
-            mcu.setMemorySpace(mcu.getMemorySpace() - p.getMemory());
-            mcu.addToMemList(p);
+        if (p.getNumberOfPages() <= mcu.getFreePages()) {
+            for(Page page : p.pageList){
+                mcu.addPage(page);
+            }
             p.setState(State.READY);
         } else {
             return false;
@@ -94,8 +97,7 @@ public class ProcessRunnable implements Runnable {
 
     private static boolean removeFromMainMemory(PCB p) {
         try {
-            mcu.setMemorySpace(mcu.getMemorySpace() + p.getMemory());
-            mcu.removeFromMemList(p);
+            mcu.removeAllProcessPages(p);
         } catch (Exception e) {
             return false;
         }
