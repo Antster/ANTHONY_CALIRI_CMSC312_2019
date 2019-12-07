@@ -8,13 +8,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.concurrent.Semaphore;
 
 /**
  *
@@ -36,14 +33,12 @@ public class Mar {
 
     public static int clock;
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         int processNum = promptForProcessAmount();
         readProgramFiles();
 
         generateProcesses(processNum);
+        setProcessIDs();
 
         //Uncomment to see ProcessList
 //        printProcessList();
@@ -67,58 +62,9 @@ public class Mar {
 
     // After sorting processing of the list is done FCFS 
     private static int startProcessing() {
-//        Semaphore semaphore = new Semaphore(1);
-//        
-//        int totalRuntime;
-//        int loopClock;
         long sysTime = System.currentTimeMillis();
-//        String op;
         for (PCB pcb : processList) {
-            (new Thread(new ProcessRunnable(pcb, sysTime, mcu))).start();
-            
-//            totalRuntime = pcb.getTotalRuntime();
-//            System.out.println(pcb.getName() + " " + totalRuntime);
-//
-//            while (!MCU.memHasSpace(pcb.getMemory())); // If main memory does not have space for this process, wait until there is space
-//
-//            addToMainMemory(pcb);
-//
-//            for (String s : pcb.getOperationList()) {
-//                if (pcb.getState() == State.READY) {
-//                    pcb.setState(State.RUN);
-//                }
-//                loopClock = 0;
-//                if (!s.contains("EXE")) {
-//                    if (s.contains("<")) {
-//                        try {
-//                            semaphore.acquire();
-//                            continue;
-//                        } catch (InterruptedException ex) {
-//                            Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
-//                        }
-//                    } else if (s.contains(">")) {
-//                        semaphore.release();
-//                        continue;
-//                    }
-//                    op = s.substring(0, 10).trim();
-//
-//                    pcb.setCurOperation(op);
-//                    totalRuntime = Short.parseShort(s.replaceAll("[^\\d]", ""));
-//
-//                    if (pcb.getCurOperation().equals("I/0")) {
-//                        pcb.setState(State.WAIT);
-//                    }
-//
-//                    while (loopClock < totalRuntime) {
-//                        if (System.currentTimeMillis() - sysTime >= 5) {
-//                            loopClock++;
-//                            sysTime = System.currentTimeMillis();
-//                        }
-//                    }
-//                }
-//            }
-//            removeFromMainMemory(pcb);
-//            pcb.setState(State.EXIT);
+            (new Thread(new ProcessRunnable(pcb, sysTime, mcu))).start();     
         }
         return 0;
     }
@@ -167,6 +113,13 @@ public class Mar {
                     processList.add(p1);
                     break;
             }
+        }
+    }
+    
+    private static void setProcessIDs(){
+        int pid = 1;
+        for(PCB p: processList){
+            p.setPID(pid++);
         }
     }
 
@@ -290,25 +243,4 @@ public class Mar {
             }
         }
     }
-
-//    public static boolean addToMainMemory(PCB p) {
-//        if (MCU.memHasSpace(p.getMemory())) {
-//            MCU.setMemorySpace(MCU.getMemorySpace() - p.getMemory());
-//            MCU.addToMemList(p);
-//            p.setState(State.READY);
-//        } else {
-//            return false;
-//        }
-//        return true;
-//    }
-//
-//    public static boolean removeFromMainMemory(PCB p) {
-//        try {
-//            MCU.setMemorySpace(MCU.getMemorySpace() + p.getMemory());
-//            MCU.removeToMemList(p);
-//        } catch (Exception e) {
-//            return false;
-//        }
-//        return true;
-//    }
 }
