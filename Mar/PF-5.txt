@@ -1,6 +1,6 @@
 Name: Krimzon Fury
 Total runtime: 97
-Memory: 97
+Memory: 5
 
 <
 CALCULATE   90

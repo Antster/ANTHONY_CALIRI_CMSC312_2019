@@ -1,6 +1,6 @@
 Name: Text Processor
 Total runtime: 220
-Memory: 45
+Memory: 10
 
 CALCULATE   15
 CALCULATE   10
