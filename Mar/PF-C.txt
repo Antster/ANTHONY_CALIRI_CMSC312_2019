@@ -1,0 +1,14 @@
+Name: Child
+Total runtime: 20
+Memory: 10
+
+CALCULATE   15
+CALCULATE   10
+<
+I/0         50
+YIELD       100
+OUT         5
+>
+CALCULATE   15
+CALCULATE   25
+EXE
