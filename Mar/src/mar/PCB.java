@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mar;
 
 import java.util.ArrayList;
@@ -18,6 +13,7 @@ enum Operation { CALCULATE, IO, YEILD, OUT }
 public class PCB implements Comparable < PCB >{
     
     private ArrayList<String> operationList;
+    protected ArrayList<Page> pageList;
     
     private String name;
     private int totalRuntime;
@@ -25,6 +21,7 @@ public class PCB implements Comparable < PCB >{
     private State state;
     private Operation curOperation;
     private boolean inCritical;
+    private int pid;
 
     public PCB () {
         this.name = "";
@@ -33,7 +30,9 @@ public class PCB implements Comparable < PCB >{
         this.state = null;
         this.curOperation = null;
         operationList = new ArrayList<>();
+        pageList = new ArrayList<>();
         this.inCritical = false;
+        fillPageList();
     }
     
     public PCB(String name, int totalRuntime, byte memory, State state, Operation curOperation) {
@@ -111,6 +110,37 @@ public class PCB implements Comparable < PCB >{
     
     public ArrayList<String> getOperationList() {
         return operationList;
+    }
+    
+    public int getNumberOfPages(){
+        if(operationList.size() % 2 == 0){
+            return operationList.size()/2;
+        } else {
+            return (operationList.size()/2) + 1;
+        }    
+    }
+    
+    public void setPID(int id){
+        pid = id;
+    }
+    
+    public int getPID(){
+        return pid;
+    }
+    
+    public boolean equals(PCB pcb){
+        return pcb.getPID() == this.pid;
+    }
+    
+    public void addPageToList(Page page){
+        pageList.add(page);
+    }
+    
+    public void fillPageList(){
+        int c = 0;
+        while (c < getNumberOfPages()){
+            pageList.add(new Page(this));
+        }
     }
     
     @Override
