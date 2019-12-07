@@ -113,10 +113,10 @@ public class PCB implements Comparable < PCB >{
     }
     
     public int getNumberOfPages(){
-        if(operationList.size() % 2 == 0){
-            return operationList.size()/2;
+        if(this.memory % 2 == 0){
+            return this.memory/2;
         } else {
-            return (operationList.size()/2) + 1;
+            return (this.memory/2) + 1;
         }    
     }
     
