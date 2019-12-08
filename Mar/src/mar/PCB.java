@@ -28,6 +28,7 @@ public class PCB implements Comparable< PCB> {
     private boolean inCritical;
     private int pid;
     private boolean finished;
+    private int priority;
 
     private boolean hasChildren;
     private boolean childrenAreComplete;
@@ -49,6 +50,7 @@ public class PCB implements Comparable< PCB> {
         this.isChild = false;
         this.parent = null;
         this.finished = false;
+        this.priority = -1;
         fillPageList();
     }
 
@@ -224,6 +226,14 @@ public class PCB implements Comparable< PCB> {
         } 
         return true;
     }
+    
+    public void setPriority(int pri){
+        this.priority = pri;
+    }
+    
+    public int getPriority(){
+        return this.priority;
+    }
 
     @Override
     public String toString() {
@@ -235,6 +245,12 @@ public class PCB implements Comparable< PCB> {
     public int compareTo(PCB o) {
         Integer x = (int) this.getTotalRuntime();
         Integer y = (int) o.getTotalRuntime();
+        return x.compareTo(y);
+    }
+    
+    public int compareTo(PCB o, boolean b) {
+        Integer x = (int) this.getPriority();
+        Integer y = (int) o.getPriority();
         return x.compareTo(y);
     }
 }

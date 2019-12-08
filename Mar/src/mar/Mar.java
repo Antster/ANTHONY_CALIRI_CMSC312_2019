@@ -21,7 +21,7 @@ public class Mar {
 
     public static ArrayList<PCB> processList = new ArrayList<>();
 
-    public static MCU mcu = new MCU(1000);
+    public static MCU mcu = new MCU(50);
 
     public static PCB p1 = new PCB();
     public static PCB p2 = new PCB();
@@ -163,6 +163,7 @@ public class Mar {
                 line = fileIn.nextLine();
                 p1.addToOpList(line);
             }
+            p1.setPriority(1);
             p1.setState(State.NEW);
 
             // READ PF-2 -------------------------------------------------------
@@ -181,6 +182,7 @@ public class Mar {
                 line = fileIn.nextLine();
                 p2.addToOpList(line);
             }
+            p2.setPriority(2);
             p2.setState(State.NEW);
 
             // READ PF-3 -------------------------------------------------------
@@ -199,6 +201,7 @@ public class Mar {
                 line = fileIn.nextLine();
                 p3.addToOpList(line);
             }
+            p3.setPriority(3);
             p3.setState(State.NEW);
 
             // READ PF-4 -------------------------------------------------------
@@ -217,6 +220,7 @@ public class Mar {
                 line = fileIn.nextLine();
                 p4.addToOpList(line);
             }
+            p4.setPriority(4);
             p4.setState(State.NEW);
 
             // READ PF-4 -------------------------------------------------------
@@ -228,6 +232,7 @@ public class Mar {
             p5.setTotalRuntime(tmp);
             line = fileIn.nextLine().replace("Memory: ", "");
             tmp = Short.parseShort(line);
+            p5.setPriority(5);
             p5.setMemory(tmp);
 
             fileIn.nextLine();
