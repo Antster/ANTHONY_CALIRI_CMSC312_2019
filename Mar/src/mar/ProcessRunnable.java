@@ -29,7 +29,12 @@ public class ProcessRunnable implements Runnable {
             for (PCB pcb : pcb.getChildrenList()) {
                 (new Thread(new ProcessRunnable(pcb, sysTime, mcu))).start();     
             }
+            // Wait for children to finish before running the rest of the process
+            while(!pcb.haveChildrenFinished());
+            
+            pcb.setChildrenComplete(true);
         }
+        
         
         boolean memHasSpaceMsg = false;
         int msgCount = 0;
@@ -95,6 +100,7 @@ public class ProcessRunnable implements Runnable {
             }
         }
         removeFromMainMemory(pcb);
+        pcb.setFinished(true);
         pcb.setState(State.EXIT);
 
         if(pcb.isChild()){

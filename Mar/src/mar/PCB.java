@@ -27,6 +27,7 @@ public class PCB implements Comparable< PCB> {
     private Operation curOperation;
     private boolean inCritical;
     private int pid;
+    private boolean finished;
 
     private boolean hasChildren;
     private boolean childrenAreComplete;
@@ -47,6 +48,7 @@ public class PCB implements Comparable< PCB> {
         this.hasChildren = false;
         this.isChild = false;
         this.parent = null;
+        this.finished = false;
         fillPageList();
     }
 
@@ -202,6 +204,25 @@ public class PCB implements Comparable< PCB> {
     
     public PCB getParent(){
         return this.parent;
+    }
+    
+    public void setFinished(boolean b){
+        this.finished = b;
+    }
+    
+    public boolean isFinished(){
+        return this.finished;
+    }
+    
+    public boolean haveChildrenFinished(){
+        if(this.hasChildren){
+            for(PCB child : childrenList){
+                if(!child.isFinished()){
+                    return false;
+                }
+            }
+        } 
+        return true;
     }
 
     @Override
