@@ -22,7 +22,7 @@ public class Mar {
     public static ArrayList<PCB> processList = new ArrayList<>();
 
     public static MCU mcu = new MCU(1000);
-    
+
     public static PCB p1 = new PCB();
     public static PCB p2 = new PCB();
     public static PCB p3 = new PCB();
@@ -64,7 +64,7 @@ public class Mar {
     private static int startProcessing() {
         long sysTime = System.currentTimeMillis();
         for (PCB pcb : processList) {
-            (new Thread(new ProcessRunnable(pcb, sysTime, mcu))).start();     
+            (new Thread(new ProcessRunnable(pcb, sysTime, mcu))).start();
         }
         return 0;
     }
@@ -87,38 +87,58 @@ public class Mar {
         return scan.nextInt();
     }
 
+    // To randomize the creation of children I have used a random number 0 to 100 with the mod operator
     private static void generateProcesses(int processNum) {
         Random rand = new Random();
-        int processToAdd;
+        int processToAdd, numChildren, haveChildren;
         for (int i = 0; i < processNum; i++) {
             processToAdd = rand.nextInt((5 - 1) + 1) + 1;
-
+            numChildren = rand.nextInt((3 - 1) + 1) + 1;
+            haveChildren = rand.nextInt((100 - 1) + 1) + 1;
             switch (processToAdd) {
                 case 1:
                     processList.add(p1);
+                    if(haveChildren % 3 == 0){
+                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    }
                     break;
                 case 2:
                     processList.add(p2);
+                    if(haveChildren % 3 == 0){
+                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    }
                     break;
                 case 3:
                     processList.add(p3);
+                    if(haveChildren % 3 == 0){
+                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    }
                     break;
                 case 4:
                     processList.add(p4);
+                    if(haveChildren % 3 == 0){
+                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    }
                     break;
                 case 5:
                     processList.add(p5);
+                    if(haveChildren % 3 == 0){
+                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    }
                     break;
                 default:
                     processList.add(p1);
+                    if(haveChildren % 3 == 0){
+                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    }
                     break;
             }
         }
     }
-    
-    private static void setProcessIDs(){
+
+    private static void setProcessIDs() {
         int pid = 1;
-        for(PCB p: processList){
+        for (PCB p : processList) {
             p.setPID(pid++);
         }
     }
@@ -221,6 +241,36 @@ public class Mar {
             Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    private static PCB generateChildProcess(){
+
+        try {
+            PCB pC = new PCB();
+            // READ PF-C -------------------------------------------------------
+            Scanner fileIn = new Scanner(new File("PF-C.txt"));
+            
+            pC.setToChild();
+            pC.setName(fileIn.nextLine().replace("Name: ", ""));
+            String line = fileIn.nextLine().replace("Total runtime: ", "");
+            Short tmp = Short.parseShort(line);
+            pC.setTotalRuntime(tmp);
+            line = fileIn.nextLine().replace("Memory: ", "");
+            tmp = Short.parseShort(line);
+            pC.setMemory(tmp);
+            
+            fileIn.nextLine();
+            while (fileIn.hasNextLine()) {
+                line = fileIn.nextLine();
+                pC.addToOpList(line);
+            }
+            pC.setState(State.NEW);
+            
+            return pC;
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     private static void printProcessList() {

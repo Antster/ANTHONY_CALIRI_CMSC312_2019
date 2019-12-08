@@ -6,15 +6,20 @@ import java.util.ArrayList;
  *
  * @author Anthony Caliri
  */
+enum State {
+    NEW, READY, RUN, WAIT, EXIT
+}
 
-enum State { NEW, READY, RUN, WAIT, EXIT }
-enum Operation { CALCULATE, IO, YEILD, OUT }
+enum Operation {
+    CALCULATE, IO, YEILD, OUT
+}
 
-public class PCB implements Comparable < PCB >{
-    
+public class PCB implements Comparable< PCB> {
+
     private ArrayList<String> operationList;
     protected ArrayList<Page> pageList;
-    
+    private ArrayList<PCB> childrenList;
+
     private String name;
     private int totalRuntime;
     private int memory;
@@ -23,7 +28,12 @@ public class PCB implements Comparable < PCB >{
     private boolean inCritical;
     private int pid;
 
-    public PCB () {
+    private boolean hasChildren;
+    private boolean childrenAreComplete;
+    private boolean isChild;
+    private PCB parent;
+
+    public PCB() {
         this.name = "";
         this.totalRuntime = 0;
         this.memory = 0;
@@ -31,10 +41,15 @@ public class PCB implements Comparable < PCB >{
         this.curOperation = null;
         operationList = new ArrayList<>();
         pageList = new ArrayList<>();
+        childrenList = new ArrayList<>();
         this.inCritical = false;
+        this.childrenAreComplete = false;
+        this.hasChildren = false;
+        this.isChild = false;
+        this.parent = null;
         fillPageList();
     }
-    
+
     public PCB(String name, int totalRuntime, byte memory, State state, Operation curOperation) {
         this.name = name;
         this.totalRuntime = totalRuntime;
@@ -58,13 +73,13 @@ public class PCB implements Comparable < PCB >{
     public void setState(State state) {
         this.state = state;
     }
-    
-    public void setCritical(boolean b){
+
+    public void setCritical(boolean b) {
         this.inCritical = b;
     }
 
     public void setCurOperation(String op) {
-        switch(op.toLowerCase()){
+        switch (op.toLowerCase()) {
             case "calculate":
                 this.curOperation = Operation.CALCULATE;
                 break;
@@ -79,11 +94,11 @@ public class PCB implements Comparable < PCB >{
                 break;
         }
     }
-    
-    public void addToOpList(String s){
+
+    public void addToOpList(String s) {
         operationList.add(s);
     }
-    
+
     public String getName() {
         return name;
     }
@@ -99,53 +114,99 @@ public class PCB implements Comparable < PCB >{
     public State getState() {
         return state;
     }
-    
-    public boolean getCritical(){
+
+    public boolean getCritical() {
         return inCritical;
     }
 
     public Operation getCurOperation() {
         return curOperation;
     }
-    
+
     public ArrayList<String> getOperationList() {
         return operationList;
     }
-    
-    public int getNumberOfPages(){
-        if(this.memory % 2 == 0){
-            return this.memory/2;
+
+    public int getNumberOfPages() {
+        if (this.memory % 2 == 0) {
+            return this.memory / 2;
         } else {
-            return (this.memory/2) + 1;
-        }    
+            return (this.memory / 2) + 1;
+        }
     }
-    
-    public void setPID(int id){
+
+    public void setPID(int id) {
         pid = id;
     }
-    
-    public int getPID(){
+
+    public int getPID() {
         return pid;
     }
-    
-    public boolean equals(PCB pcb){
+
+    public boolean equals(PCB pcb) {
         return pcb.getPID() == this.pid;
     }
-    
-    public void addPageToList(Page page){
+
+    public void addPageToList(Page page) {
         pageList.add(page);
     }
-    
-    public void fillPageList(){
+
+    public void fillPageList() {
         int c = 0;
-        while (c < getNumberOfPages()){
+        while (c < getNumberOfPages()) {
             pageList.add(new Page(this));
         }
     }
     
+    public ArrayList<PCB> getChildrenList(){
+        return this.childrenList;
+    }
+
+    public void setChildrenComplete(boolean b) {
+        this.childrenAreComplete = b;
+    }
+
+    public boolean getChildrenComplete() {
+        return this.childrenAreComplete;
+    }
+
+    public void createChildren(int num, PCB child, PCB parent) {
+        int c = 0;
+        while (c < num) {
+            child.setParent(parent);
+            childrenList.add(child);
+            c++;
+        }
+        this.hasChildren = true;
+    }
+
+    public void setHasChildren(boolean b) {
+        this.hasChildren = b;
+    }
+
+    public boolean hasChildren() {
+        return this.hasChildren;
+    }
+    
+    public void setToChild(){
+        this.isChild = true;
+    }
+    
+    public boolean isChild(){
+        return this.isChild;
+    }
+    
+    public void setParent(PCB p){
+        this.parent = p;
+    }
+    
+    public PCB getParent(){
+        return this.parent;
+    }
+
     @Override
-    public String toString(){
-        return "Process Name: " + getName() + " Total Runtime: " + getTotalRuntime() + " Memory: " + getMemory() 
+    public String toString() {
+        return "Process Name: " + getName() + " Total Runtime: " + getTotalRuntime() + " Memory: " + getMemory()
                 + " \nCurrent State: " + getState() + " Current Operation: " + getCurOperation();
     }
 

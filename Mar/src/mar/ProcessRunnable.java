@@ -24,12 +24,29 @@ public class ProcessRunnable implements Runnable {
 
     @Override
     public void run() {
+        if(pcb.hasChildren()){
+            long sysTime = System.currentTimeMillis();
+            for (PCB pcb : pcb.getChildrenList()) {
+                (new Thread(new ProcessRunnable(pcb, sysTime, mcu))).start();     
+            }
+        }
+        
         boolean memHasSpaceMsg = false;
         int msgCount = 0;
         Semaphore semaphore = new Semaphore(1);
         String op;
         totalRuntime = pcb.getTotalRuntime();
-        System.out.println("STARTED " + pcb.getName() + " " + totalRuntime);
+        if(pcb.isChild()){
+            System.out.println("\tSTARTED CHILD PROCESS --- PARENT: " + pcb.getParent().getName());
+        } else {
+            if(pcb.hasChildren()){
+                System.out.println("STARTED " + pcb.getName() + " " + totalRuntime + " HAS " + pcb.getChildrenList().size() + " CHILDREN");
+            } else {
+                System.out.println("STARTED " + pcb.getName() + " " + totalRuntime);
+            }
+            
+        }
+        
 
         // If main memory does not have space for this process, wait until there is space
         while (numPages > mcu.getFreePages()) {
@@ -80,7 +97,11 @@ public class ProcessRunnable implements Runnable {
         removeFromMainMemory(pcb);
         pcb.setState(State.EXIT);
 
-        System.out.println("ENDED " + pcb.getName());
+        if(pcb.isChild()){
+            System.out.println("\tENDED CHILD PROCESS --- PARENT: " + pcb.getParent().getName());
+        } else {
+            System.out.println("ENDED " + pcb.getName());
+        }
     }
 
     private static boolean addToMainMemory(PCB p) {
