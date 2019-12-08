@@ -98,37 +98,37 @@ public class Mar {
             switch (processToAdd) {
                 case 1:
                     processList.add(p1);
-                    if(haveChildren % 3 == 0){
+                    if(haveChildren % 2 == 0){
                     processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
                     }
                     break;
                 case 2:
                     processList.add(p2);
-                    if(haveChildren % 3 == 0){
+                    if(haveChildren % 2 == 0){
                     processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
                     }
                     break;
                 case 3:
                     processList.add(p3);
-                    if(haveChildren % 3 == 0){
+                    if(haveChildren % 2 == 0){
                     processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
                     }
                     break;
                 case 4:
                     processList.add(p4);
-                    if(haveChildren % 3 == 0){
+                    if(haveChildren % 2 == 0){
                     processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
                     }
                     break;
                 case 5:
                     processList.add(p5);
-                    if(haveChildren % 3 == 0){
+                    if(haveChildren % 2 == 0){
                     processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
                     }
                     break;
                 default:
                     processList.add(p1);
-                    if(haveChildren % 3 == 0){
+                    if(haveChildren % 2 == 0){
                     processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
                     }
                     break;
