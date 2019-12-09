@@ -29,6 +29,8 @@ public class PCB implements Comparable< PCB> {
     private int pid;
     private boolean finished;
     private int priority;
+    private boolean isRunning;
+    private boolean halted;
 
     private boolean hasChildren;
     private boolean childrenAreComplete;
@@ -51,6 +53,8 @@ public class PCB implements Comparable< PCB> {
         this.parent = null;
         this.finished = false;
         this.priority = -1;
+        this.isRunning = false;
+        this.halted = false;
         fillPageList();
     }
 
@@ -233,6 +237,21 @@ public class PCB implements Comparable< PCB> {
     
     public int getPriority(){
         return this.priority;
+    }
+    
+    public boolean isRunning(){
+        return this.isRunning;
+    }
+    public void setRunning(boolean b){
+        this.isRunning = b;
+    }
+    
+    public boolean isHalted(){
+        return this.halted;
+    }
+    
+    public void setHalted(boolean b){
+        this.halted = b;
     }
 
     @Override

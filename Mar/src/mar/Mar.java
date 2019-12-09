@@ -6,22 +6,25 @@ package mar;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- *
- */
 public class Mar {
 
     public static ArrayList<PCB> processList = new ArrayList<>();
+    public static PriorityQueue<PCB> processQueue = new PriorityQueue<>();
 
     public static MCU mcu = new MCU(50);
+
+    public static MessageHandler msgHandler = new MessageHandler();
 
     public static PCB p1 = new PCB();
     public static PCB p2 = new PCB();
@@ -44,15 +47,47 @@ public class Mar {
 //        printProcessList();
         sortProcessList();
 
-        int returnVal = startProcessing();
+        Long before = System.currentTimeMillis(), sTime, rrTime;
+        startProcessingSortest(); // PROCESSING
+        System.out.println("\nSHORTEST PROCESS FIRST HAS FINISHED!");
+        sTime = System.currentTimeMillis() - before;
+        System.out.println("TIME TAKEN: " + sTime);
 
-//        switch (returnVal) {
-//            case 0:
-//                System.out.println("\nProcessing finished normaly");
-//                break;
-//            case -1:
-//                System.out.println("\nError while processing!");
-//        }
+        for(PCB p : processList){
+            p.setRunning(false);
+        }
+        
+        before = System.currentTimeMillis();
+        System.out.println("\nROUND ROBIN HAS STARTED!");
+        startProcessingRR(); // PROCESSING
+        System.out.println("\nROUND ROBIN HAS FINISHED!");
+        rrTime = System.currentTimeMillis() - before;
+        System.out.println("TIME TAKEN: " + rrTime);
+
+        compareSchedulers(sTime, rrTime);
+    }
+
+    private static void compareSchedulers(double ss, double rr) {
+        // If shortest took longer else round robin took longer
+        double per = 0;
+        if (ss < rr) {
+            System.out.println("\nShortest Process First was faster by: " + (rr - ss) + " milliseconds");
+        } else {
+            System.out.println("\nRound Robin was faster by: " + (ss - rr) + " milliseconds");
+        }
+
+        per = (Math.abs(rr - ss) / ((rr + ss) / 2)) * 100;
+        System.out.println("This is a " + round(per, 2) + "% improvement");
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
     // Sort by shortest runtime
@@ -61,12 +96,62 @@ public class Mar {
     }
 
     // After sorting processing of the list is done FCFS 
-    private static int startProcessing() {
+    private static void startProcessingSortest() {
         long sysTime = System.currentTimeMillis();
+        ArrayList<Thread> tList = new ArrayList<>();
         for (PCB pcb : processList) {
-            (new Thread(new ProcessRunnable(pcb, sysTime, mcu))).start();
+            Thread t = new Thread(new ProcessRunnable(pcb, sysTime, mcu, msgHandler));
+            t.start();
+            tList.add(t);
         }
-        return 0;
+
+        for (Thread t : tList) {
+            try {
+                t.join();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private static void startProcessingRR() {
+
+        ArrayList<Thread> tList = new ArrayList<>();
+        long sysTime = System.currentTimeMillis();
+        Iterator elm = processQueue.iterator();
+        PCB pcb;
+        while (elm.hasNext()) {
+            pcb = (PCB) elm.next();
+            if (!pcb.isRunning()) {
+                ProcessRunnable pr = new ProcessRunnable(pcb, sysTime, mcu, msgHandler);
+                Thread t = new Thread(pr);
+                t.start();
+                tList.add(t);
+            } else {
+
+            }
+            wait50Clock();
+            pcb.setHalted(true);
+        }
+
+        for (Thread t : tList) {
+            try {
+                t.join();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private static void wait50Clock() {
+        int loopClock = 0;
+        Long sysTime = System.currentTimeMillis();
+        while (loopClock < 50) {
+            if (System.currentTimeMillis() - sysTime >= 5) {
+                loopClock++;
+                sysTime = System.currentTimeMillis();
+            }
+        }
     }
 
     private static void printProcessState(PCB pcb) {
@@ -93,43 +178,49 @@ public class Mar {
         int processToAdd, numChildren, haveChildren;
         for (int i = 0; i < processNum; i++) {
             processToAdd = rand.nextInt((5 - 1) + 1) + 1;
-            numChildren = rand.nextInt((3 - 1) + 1) + 1;
+            numChildren = rand.nextInt((4 - 1) + 1) + 1;
             haveChildren = rand.nextInt((100 - 1) + 1) + 1;
             switch (processToAdd) {
                 case 1:
                     processList.add(p1);
-                    if(haveChildren % 2 == 0){
-                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    processQueue.add(p1);
+                    if (haveChildren % 2 == 0) {
+                        processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
                     }
                     break;
                 case 2:
                     processList.add(p2);
-                    if(haveChildren % 2 == 0){
-                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    processQueue.add(p2);
+                    if (haveChildren % 2 == 0) {
+                        processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
                     }
                     break;
                 case 3:
                     processList.add(p3);
-                    if(haveChildren % 2 == 0){
-                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    processQueue.add(p3);
+                    if (haveChildren % 2 == 0) {
+                        processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
                     }
                     break;
                 case 4:
                     processList.add(p4);
-                    if(haveChildren % 2 == 0){
-                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    processQueue.add(p4);
+                    if (haveChildren % 2 == 0) {
+                        processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
                     }
                     break;
                 case 5:
                     processList.add(p5);
-                    if(haveChildren % 2 == 0){
-                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    processQueue.add(p5);
+                    if (haveChildren % 2 == 0) {
+                        processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
                     }
                     break;
                 default:
                     processList.add(p1);
-                    if(haveChildren % 2 == 0){
-                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    processQueue.add(p1);
+                    if (haveChildren % 2 == 0) {
+                        processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
                     }
                     break;
             }
@@ -248,13 +339,13 @@ public class Mar {
 
     }
 
-    private static PCB generateChildProcess(){
+    private static PCB generateChildProcess() {
 
         try {
             PCB pC = new PCB();
             // READ PF-C -------------------------------------------------------
             Scanner fileIn = new Scanner(new File("PF-C.txt"));
-            
+
             pC.setToChild();
             pC.setName(fileIn.nextLine().replace("Name: ", ""));
             String line = fileIn.nextLine().replace("Total runtime: ", "");
@@ -263,14 +354,14 @@ public class Mar {
             line = fileIn.nextLine().replace("Memory: ", "");
             tmp = Short.parseShort(line);
             pC.setMemory(tmp);
-            
+
             fileIn.nextLine();
             while (fileIn.hasNextLine()) {
                 line = fileIn.nextLine();
                 pC.addToOpList(line);
             }
             pC.setState(State.NEW);
-            
+
             return pC;
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
