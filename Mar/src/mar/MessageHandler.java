@@ -6,23 +6,58 @@
 
 package mar;
 
+import static java.lang.Thread.sleep;
+
 /**
  *
  * @author Anthony Caliri
  */
-public class MessageHandler {
+class MessageHandler {
+		//Do with and without wait
+		String message;
 
+		synchronized public void send(String msg) {
+
+	        if(message != null) {
+	        	try {
+					wait();
+				} catch (InterruptedException e) {}
+	        }
+
+			System.out.println("Sending: " + msg ); 
+	        message = msg;
+	    } 
+		
+		synchronized public void receive() { 
+			System.out.println(message);
+			message = null;
+			notify();
+	    } 
+	}
+
+class WaitingMessageThreadSend extends Thread{
+    private MessageHandler sender;
     private String message;
-    
-    public MessageHandler(){
-        message = "";
+    public WaitingMessageThreadSend(MessageHandler aSender, String aMessage) {
+        sender = aSender;
+        message = aMessage;
     }
-    
-    public void setMessage(String msg){
-        this.message = msg;
+    @Override
+    public void run() {
+        try {
+            sender.send(message);
+            sleep(1000);
+        } catch (InterruptedException e) {}
     }
-    
-    public String sendMessage(){
-        return this.message;
+}
+
+class WaitingMessageThreadReceive extends Thread{
+    private MessageHandler sender;
+    public WaitingMessageThreadReceive(MessageHandler aSender) {
+        sender = aSender;
+    }
+    @Override
+    public void run() {
+            sender.receive();
     }
 }
