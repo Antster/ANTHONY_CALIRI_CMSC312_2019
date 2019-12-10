@@ -56,6 +56,7 @@ public class Mar {
         for(PCB p : processList){
             p.setRunning(false);
         }
+        System.out.println("RESETING FOR NEXT SCHEDULER");
         
         before = System.currentTimeMillis();
         System.out.println("\nROUND ROBIN HAS STARTED!");
@@ -184,44 +185,44 @@ public class Mar {
                 case 1:
                     processList.add(p1);
                     processQueue.add(p1);
-                    if (haveChildren % 2 == 0) {
+//                    if (haveChildren % 2 == 0) {
                         processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
-                    }
+//                    }
                     break;
                 case 2:
                     processList.add(p2);
                     processQueue.add(p2);
-                    if (haveChildren % 2 == 0) {
+//                    if (haveChildren % 2 == 0) {
                         processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
-                    }
+//                    }
                     break;
                 case 3:
                     processList.add(p3);
                     processQueue.add(p3);
-                    if (haveChildren % 2 == 0) {
+//                    if (haveChildren % 2 == 0) {
                         processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
-                    }
+//                    }
                     break;
                 case 4:
                     processList.add(p4);
                     processQueue.add(p4);
-                    if (haveChildren % 2 == 0) {
+//                    if (haveChildren % 2 == 0) {
                         processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
-                    }
+//                    }
                     break;
                 case 5:
                     processList.add(p5);
                     processQueue.add(p5);
-                    if (haveChildren % 2 == 0) {
+//                    if (haveChildren % 2 == 0) {
                         processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
-                    }
+//                    }
                     break;
                 default:
                     processList.add(p1);
                     processQueue.add(p1);
-                    if (haveChildren % 2 == 0) {
+//                    if (haveChildren % 2 == 0) {
                         processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
-                    }
+//                    }
                     break;
             }
         }
