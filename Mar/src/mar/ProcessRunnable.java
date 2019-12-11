@@ -13,6 +13,7 @@ public class ProcessRunnable implements Runnable {
 
     private PCB pcb;
     private final int IOWAITTIME = 50;
+    private static final int CLOCK = 5;
     private int totalRuntime, loopClock, numPages;
     private long sysTime;
     private static MCU mcu;
@@ -110,7 +111,7 @@ public class ProcessRunnable implements Runnable {
                     }
 
                     while (loopClock < totalRuntime) {
-                        if (System.currentTimeMillis() - sysTime >= 5) {
+                        if (System.currentTimeMillis() - sysTime >= CLOCK) {
                             loopClock++;
                             sysTime = System.currentTimeMillis();
                         }

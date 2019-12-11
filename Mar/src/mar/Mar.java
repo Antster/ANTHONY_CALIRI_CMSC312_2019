@@ -23,6 +23,8 @@ public class Mar {
     public static PriorityQueue<PCB> processQueue = new PriorityQueue<>();
 
     public static MCU mcu = new MCU(50);
+    
+    public static final int CLOCK = 5;
 
     public static MessageHandler msgHandler = new MessageHandler();
     public static WaitingMessageThreadReceive receiveThread = new WaitingMessageThreadReceive(msgHandler);
@@ -203,7 +205,7 @@ public class Mar {
         int loopClock = 0;
         Long sysTime = System.currentTimeMillis();
         while (loopClock < 50) {
-            if (System.currentTimeMillis() - sysTime >= 5) {
+            if (System.currentTimeMillis() - sysTime >= CLOCK) {
                 loopClock++;
                 sysTime = System.currentTimeMillis();
             }
