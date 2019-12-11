@@ -38,7 +38,10 @@ public class Mar {
 
     public static int clock;
 
+    private static UIMessager uiMessager = new UIMessager();
+
     public static void main(String[] args) {
+        new Console(uiMessager);
         int processNum = promptForProcessAmount();
         readProgramFiles();
 
@@ -48,18 +51,18 @@ public class Mar {
         //Uncomment to see ProcessList
 //        printProcessList();
         sortProcessList();
- 
+
         Long before = System.currentTimeMillis(), sTime, rrTime;
         startProcessingSortest(); // PROCESSING
         System.out.println("\nSHORTEST PROCESS FIRST HAS FINISHED!");
         sTime = System.currentTimeMillis() - before;
         System.out.println("TIME TAKEN: " + sTime);
 
-        for(PCB p : processList){
+        for (PCB p : processList) {
             p.setRunning(false);
         }
         System.out.println("RESETING FOR NEXT SCHEDULER");
-        
+
         before = System.currentTimeMillis();
         System.out.println("\nROUND ROBIN HAS STARTED!");
         startProcessingRR(); // PROCESSING
@@ -68,6 +71,25 @@ public class Mar {
         System.out.println("TIME TAKEN: " + rrTime);
 
         compareSchedulers(sTime, rrTime);
+
+        int processToRun;
+        while (true) {
+            processToRun = promptToRunSingleProcess();
+            if (processToRun == 6) {
+                break;
+            } else {
+                startSingleProcess(processToRun);
+            }
+        }
+
+        System.out.println("Mar shutting down!");
+        System.out.println("Please wait...");
+        try {
+            Thread.sleep(2500);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.exit(0);
     }
 
     private static void compareSchedulers(double ss, double rr) {
@@ -100,7 +122,7 @@ public class Mar {
 
     // After sorting processing of the list is done FCFS 
     private static void startProcessingSortest() {
-        
+
         long sysTime = System.currentTimeMillis();
         ArrayList<Thread> tList = new ArrayList<>();
         for (PCB pcb : processList) {
@@ -115,6 +137,36 @@ public class Mar {
             } catch (InterruptedException ex) {
                 Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+    }
+
+    private static void startSingleProcess(int in) {
+        long sysTime = System.currentTimeMillis();
+        PCB pcb = null;
+        switch (in) {
+            case 1:
+                pcb = p1;
+                break;
+            case 2:
+                pcb = p2;
+                break;
+            case 3:
+                pcb = p3;
+                break;
+            case 4:
+                pcb = p4;
+                break;
+            case 5:
+                pcb = p5;
+                break;
+        }
+
+        Thread t = new Thread(new ProcessRunnable(pcb, sysTime, mcu, msgHandler));
+        t.start();
+        try {
+            t.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -173,7 +225,66 @@ public class Mar {
 
     private static int promptForProcessAmount() {
         System.out.println("How many processes would you like to generate?");
-        return scan.nextInt();
+        int msg = 0;
+        while (uiMessager.getMessage() == -1) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Mar.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        msg = uiMessager.getMessage();
+        uiMessager.setMessage(-1);
+        return msg;
+    }
+
+    private static int promptToRunSingleProcess() {
+        System.out.println("\nRun a single process?");
+        System.out.println("\n\t1. Text Processor (PF-1)");
+        System.out.println("\t2. Quantum Leap (PF-2)");
+        System.out.println("\t3. Prime Process (PF-3)");
+        System.out.println("\t4. Dark Haven (PF-4)");
+        System.out.println("\t5. Krimzon Fury (PF-5)");
+        System.out.println("\nTo exit enter 6");
+        System.out.println("To run a process input its number\n");
+        int msg = 0;
+        boolean keepLooping = true;
+        while (keepLooping) {
+
+            switch (uiMessager.getMessage()) {
+                case 1:
+                    msg = 1;
+                    uiMessager.setMessage(-1);
+                    keepLooping = false;
+                    break;
+                case 2:
+                    msg = 2;
+                    uiMessager.setMessage(-1);
+                    keepLooping = false;
+                    break;
+                case 3:
+                    msg = 3;
+                    uiMessager.setMessage(-1);
+                    keepLooping = false;
+                    break;
+                case 4:
+                    msg = 4;
+                    uiMessager.setMessage(-1);
+                    keepLooping = false;
+                    break;
+                case 5:
+                    msg = 5;
+                    uiMessager.setMessage(-1);
+                    keepLooping = false;
+                    break;
+                case 6:
+                    msg = 6;
+                    uiMessager.setMessage(-1);
+                    keepLooping = false;
+                    break;
+            }
+        }
+        return msg;
     }
 
     // To randomize the creation of children I have used a random number 0 to 100 with the mod operator
@@ -189,42 +300,42 @@ public class Mar {
                     processList.add(p1);
                     processQueue.add(p1);
 //                    if (haveChildren % 2 == 0) {
-                        processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
 //                    }
                     break;
                 case 2:
                     processList.add(p2);
                     processQueue.add(p2);
 //                    if (haveChildren % 2 == 0) {
-                        processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
 //                    }
                     break;
                 case 3:
                     processList.add(p3);
                     processQueue.add(p3);
 //                    if (haveChildren % 2 == 0) {
-                        processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
 //                    }
                     break;
                 case 4:
                     processList.add(p4);
                     processQueue.add(p4);
 //                    if (haveChildren % 2 == 0) {
-                        processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
 //                    }
                     break;
                 case 5:
                     processList.add(p5);
                     processQueue.add(p5);
 //                    if (haveChildren % 2 == 0) {
-                        processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
 //                    }
                     break;
                 default:
                     processList.add(p1);
                     processQueue.add(p1);
 //                    if (haveChildren % 2 == 0) {
-                        processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
+                    processList.get(processList.size() - 1).createChildren(numChildren, generateChildProcess(), processList.get(processList.size() - 1));
 //                    }
                     break;
             }
