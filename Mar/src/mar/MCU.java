@@ -9,6 +9,9 @@ public class MCU {
     private int freePages;
     
     private Page[] pageArray;
+    private int[] storageArray = new int[5000];
+    private int[] cacheArray = new int[500];
+    private int[] registerArray = new int[50];
     
     public MCU(int memSpace) {
         this.freePages = memSpace;
