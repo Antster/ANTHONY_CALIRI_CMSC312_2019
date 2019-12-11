@@ -25,6 +25,8 @@ public class Mar {
     public static MCU mcu = new MCU(50);
 
     public static MessageHandler msgHandler = new MessageHandler();
+    public static WaitingMessageThreadReceive receiveThread = new WaitingMessageThreadReceive(msgHandler);
+    public static WaitingMessageThreadSend sendThread = null;
 
     public static PCB p1 = new PCB();
     public static PCB p2 = new PCB();
@@ -46,7 +48,7 @@ public class Mar {
         //Uncomment to see ProcessList
 //        printProcessList();
         sortProcessList();
-
+ 
         Long before = System.currentTimeMillis(), sTime, rrTime;
         startProcessingSortest(); // PROCESSING
         System.out.println("\nSHORTEST PROCESS FIRST HAS FINISHED!");
@@ -98,6 +100,7 @@ public class Mar {
 
     // After sorting processing of the list is done FCFS 
     private static void startProcessingSortest() {
+        
         long sysTime = System.currentTimeMillis();
         ArrayList<Thread> tList = new ArrayList<>();
         for (PCB pcb : processList) {

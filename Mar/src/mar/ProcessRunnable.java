@@ -17,7 +17,8 @@ public class ProcessRunnable implements Runnable {
     private long sysTime;
     private static MCU mcu;
     private static MessageHandler msgHandler;
-    private static Thread sendThread, receiveThread;
+    private static WaitingMessageThreadSend sendThread = null;
+    private static WaitingMessageThreadReceive receiveThread;
     private static Random rand = new Random();
 
     public ProcessRunnable(PCB p, long sT, MCU mem, MessageHandler msgH) {
@@ -40,9 +41,7 @@ public class ProcessRunnable implements Runnable {
             while (!pcb.haveChildrenFinished());
 
             pcb.setChildrenComplete(true);
-        } else {
-
-        }
+        } 
 
         boolean memHasSpaceMsg = false;
         int msgCount = 0;
@@ -71,8 +70,9 @@ public class ProcessRunnable implements Runnable {
         addToMainMemory(pcb);
 
         for (String s : pcb.getOperationList()) {
+            this.msgHandler.receive();
             if (!pcb.isHalted()) {
-                if ((rand.nextInt((100 - 1) + 1) + 1) % 20 == 0) {
+                if ((rand.nextInt((100 - 1) + 1) + 1) == 77) { // gives I/O interrupt a 1/100 chance in happening
                     System.out.println("--- I/O Interrupt Triggered! ---");
                     try {
                         pcb.setState(State.WAIT);
@@ -128,21 +128,9 @@ public class ProcessRunnable implements Runnable {
         pcb.setState(State.EXIT);
 
         if (pcb.isChild()) {
-            System.out.println("\tENDED CHILD PROCESS. ALERTING PARENT: " + pcb.getParent().getName());
-//            this.sendThread = new WaitingMessageThreadSend(this.msgHandler, "CHILD HAS FINISHED!");
-//            this.sendThread.start();
-//            try {
-//                this.sendThread.join();
-//            } catch (InterruptedException ex) {
-//                Logger.getLogger(ProcessRunnable.class.getName()).log(Level.SEVERE, null, ex);
-//            }
+            this.msgHandler.send("\tENDED CHILD PROCESS. ALERTED PARENT: " + pcb.getParent().getName());
         } else {
             System.out.println("ENDED " + pcb.getName());
-//            try {
-//                this.receiveThread.join();
-//            } catch (InterruptedException ex) {
-//                Logger.getLogger(ProcessRunnable.class.getName()).log(Level.SEVERE, null, ex);
-//            }
         }
     }
 
