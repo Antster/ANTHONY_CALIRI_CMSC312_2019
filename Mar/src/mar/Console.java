@@ -28,7 +28,7 @@ public class Console extends WindowAdapter implements WindowListener, ActionList
     public Console(UIMessager uiIn) {
         this.uiMessager = uiIn;
         // create all components and add them
-        frame = new JFrame("Java Console");
+        frame = new JFrame("Mar");
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension frameSize = new Dimension((int) (screenSize.width / 2), (int) (screenSize.height / 2));
         int x = (int) (frameSize.width / 2);
