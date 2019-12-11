@@ -225,6 +225,7 @@ public class Mar {
 
     private static int promptForProcessAmount() {
         System.out.println("How many processes would you like to generate?");
+        System.out.println("These processes are predefined and randomly given children.");
         int msg = 0;
         while (uiMessager.getMessage() == -1) {
             try {
